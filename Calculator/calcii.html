@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safe Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <link rel="stylesheet" href="calci.css">
+    <style>
+        .item { padding: 10px; margin: 5px; cursor: pointer; }
+        #display { font-size: 2em; margin: 10px; }
+    </style>
+</head>
+<body>
+  <div class="calculator">
+    <div id="display">0</div>
+    <div class="buttons">
+        <button class="item">7</button>
+        <button class="item">8</button>
+        <button class="item">9</button>
+        <button class="item operator">÷</button>
+
+        <button class="item">4</button>
+        <button class="item">5</button>
+        <button class="item">6</button>
+        <button class="item operator">×</button>
+
+        <button class="item">1</button>
+        <button class="item">2</button>
+        <button class="item">3</button>
+        <button class="item operator">-</button>
+
+        <button class="item">0</button>
+        <button class="item">.</button>
+        <button class="item equal">=</button>
+        <button class="item operator">+</button>
+
+        <button class="item clear">C</button>
+        <button class="item">CE</button>
+        <button class="item">ans</button>
+    </div>
+</div>
+
+
+<script>
+    const buttons = document.querySelectorAll('.item');
+    const display = document.getElementById('display');
+
+    let currentInput = '';
+    let answer = '';
+
+    const isOperator = char => ['+', '-', '*', '/', '%'].includes(char);
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const value = button.textContent;
+
+            if (value === 'C') {
+                currentInput = '';
+                display.textContent = '0';
+            } else if (value === 'CE') {
+                currentInput = currentInput.slice(0, -1);
+                display.textContent = currentInput || '0';
+            } else if (value === '=') {
+                try {
+                    const expression = currentInput
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/');
+
+                    const result = math.evaluate(expression);
+                    answer = result;
+                    display.textContent = result;
+                    currentInput = result.toString();
+                } catch (err) {
+                    display.textContent = 'Error';
+                    currentInput = '';
+                }
+            } else if (value === 'ans') {
+                currentInput += answer.toString();
+                display.textContent = currentInput;
+            } else {
+                const lastChar = currentInput.slice(-1);
+                const mappedValue = value === '×' ? '*' :
+                                    value === '÷' ? '/' : value;
+
+                if (currentInput === '' && isOperator(mappedValue) && mappedValue !== '-') {
+                    return;
+                }
+
+                if (isOperator(lastChar) && isOperator(mappedValue)) {
+                    currentInput = currentInput.slice(0, -1) + mappedValue;
+                } else {
+                    currentInput += mappedValue;
+                }
+
+                display.textContent = currentInput;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
